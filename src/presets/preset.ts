@@ -12,7 +12,7 @@
  */
 
 
-import { httpProblemJsonPlugin } from "../core";
+import { unifiedErrorPlugin } from "../core";
 import { isDatabaseError } from "./hooks/db/guards";
 import { mapDatabaseError } from "./hooks/db/mapper";
 import { logErrorWithConsola } from "./hooks/logger/console";
@@ -72,7 +72,7 @@ export const standardErrorSuite = (options: StandardErrorSuiteOptions = {}) => {
   } = options;
 
   // 2. 调用核心插件
-  return httpProblemJsonPlugin({
+  return unifiedErrorPlugin({
     typeBaseUrl,
 
     // 🔗 钩子 1: 转换逻辑 (Transform Hook)

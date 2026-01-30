@@ -5,7 +5,7 @@ import { HttpError, ProblemError } from "./errors";
 import { ErrorContext, HttpProblemJsonOptions } from "./types";
 
 
-export function httpProblemJsonPlugin(options: HttpProblemJsonOptions = {}) {
+export function unifiedErrorPlugin(options: HttpProblemJsonOptions = {}) {
   return new Elysia({ name: "elysia-http-problem-json" })
     .error({ PROBLEM_ERROR: ProblemError })
     .onError({ as: "global" }, ({ code, error, path, set, request }) => {
