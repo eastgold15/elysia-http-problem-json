@@ -15,10 +15,15 @@ describe("HttpError.PaymentRequired", () => {
     const json = await res.json();
 
     expect(res.status).toBe(402);
+    // RFC 9457 Section 6: Content-Type must be application/problem+json
+    expect(res.headers.get("Content-Type")).toContain(
+      "application/problem+json",
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/402",
       title: "Payment Required",
       status: 402,
+      instance: "/resource",
       detail: "Payment required",
     });
   });

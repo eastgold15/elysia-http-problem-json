@@ -15,10 +15,15 @@ describe("HttpError.MethodNotAllowed", () => {
     const json = await res.json();
 
     expect(res.status).toBe(405);
+    // RFC 9457 Section 6: Content-Type must be application/problem+json
+    expect(res.headers.get("Content-Type")).toContain(
+      "application/problem+json",
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/405",
       title: "Method Not Allowed",
       status: 405,
+      instance: "/resource",
       detail: "Method not allowed",
     });
   });

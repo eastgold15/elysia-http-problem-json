@@ -15,10 +15,15 @@ describe("HttpError.NotAcceptable", () => {
     const json = await res.json();
 
     expect(res.status).toBe(406);
+    // RFC 9457 Section 6: Content-Type must be application/problem+json
+    expect(res.headers.get("Content-Type")).toContain(
+      "application/problem+json",
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/406",
       title: "Not Acceptable",
       status: 406,
+      instance: "/resource",
       detail: "Not acceptable",
     });
   });

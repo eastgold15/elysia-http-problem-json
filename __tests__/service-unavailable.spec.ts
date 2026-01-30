@@ -15,10 +15,15 @@ describe("HttpError.ServiceUnavailable", () => {
     const json = await res.json();
 
     expect(res.status).toBe(503);
+    // RFC 9457 Section 6: Content-Type must be application/problem+json
+    expect(res.headers.get("Content-Type")).toContain(
+      "application/problem+json",
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/503",
       title: "Service Unavailable",
       status: 503,
+      instance: "/resource",
       detail: "Service unavailable",
     });
   });
