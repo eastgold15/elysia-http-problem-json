@@ -1,4 +1,4 @@
-import { Elysia, status } from "elysia";
+import { Elysia } from "elysia";
 import { HttpError, ProblemError } from "./errors";
 
 export * from "./errors";
@@ -68,20 +68,20 @@ export function httpProblemJsonPlugin(options?: HttpProblemJsonOptions) {
         }
         case "NOT_FOUND": {
           problem = new HttpError.NotFound(
-            `The requested resource ${path} was not found`,
+            `The requested resource ${path} was not found`
           );
           break;
         }
         case "PARSE": {
           problem = new HttpError.BadRequest(
-            `The request could not be parsed: ${error.message}`,
+            `The request could not be parsed: ${error.message}`
           );
           break;
         }
         case "INVALID_COOKIE_SIGNATURE": {
           problem = new HttpError.BadRequest(
             "The provided cookie signature is invalid",
-            { key: error.key },
+            { key: error.key }
           );
           break;
         }

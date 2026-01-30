@@ -1,6 +1,6 @@
-import { expect, describe, it } from "bun:test";
-import { HttpError } from "../src/errors";
+import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
+import { HttpError } from "../src/errors";
 import { httpProblemJsonPlugin } from "../src/index";
 
 describe("HttpError.NotAcceptable", () => {
@@ -17,7 +17,7 @@ describe("HttpError.NotAcceptable", () => {
     expect(res.status).toBe(406);
     // RFC 9457 Section 6: Content-Type must be application/problem+json
     expect(res.headers.get("Content-Type")).toContain(
-      "application/problem+json",
+      "application/problem+json"
     );
     expect(json).toEqual({
       type: "https://httpstatuses.com/406",

@@ -27,7 +27,7 @@ export class ProblemError extends Error {
     status: number,
     detail?: string,
     instance?: string,
-    extensions?: Record<string, any>,
+    extensions?: Record<string, any>
   ) {
     super(detail || title);
     Object.setPrototypeOf(this, ProblemError.prototype);
@@ -74,7 +74,7 @@ class BadRequest extends ProblemError {
       400,
       detail,
       undefined,
-      extensions,
+      extensions
     );
   }
 }

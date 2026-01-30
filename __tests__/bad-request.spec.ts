@@ -1,8 +1,8 @@
-import { expect, describe, it } from "bun:test";
-import { HttpError } from "../src/errors";
+import { describe, expect, it } from "bun:test";
 import { Elysia, fileType, InvalidCookieSignature } from "elysia";
-import { httpProblemJsonPlugin } from "../src/index";
 import z from "zod";
+import { HttpError } from "../src/errors";
+import { httpProblemJsonPlugin } from "../src/index";
 
 describe("HttpError.BadRequest", () => {
   it("should handle explicit HttpError.BadRequest", async () => {
@@ -22,7 +22,7 @@ describe("HttpError.BadRequest", () => {
     expect(res.status).toBe(400);
     // RFC 9457 Section 6: Content-Type must be application/problem+json
     expect(res.headers.get("Content-Type")).toContain(
-      "application/problem+json; charset=utf-8",
+      "application/problem+json; charset=utf-8"
     );
     expect(json).toEqual({
       type: "https://httpstatuses.com/400",
@@ -44,14 +44,16 @@ describe("HttpError.BadRequest", () => {
         params: z.object({
           id: z.coerce.number(),
         }),
-      },
+      }
     );
 
     const res = await app.handle(new Request("http://localhost/foo/forty"));
     const json = await res.json();
 
     expect(res.status).toBe(400);
-    expect(res.headers.get("Content-Type")).toBe("application/problem+json; charset=utf-8");
+    expect(res.headers.get("Content-Type")).toBe(
+      "application/problem+json; charset=utf-8"
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/400",
       title: "Bad Request",
@@ -62,9 +64,9 @@ describe("HttpError.BadRequest", () => {
         {
           message: "Invalid input: expected number, received NaN",
           path: "id",
-          value:{
+          value: {
             id: "forty",
-          }
+          },
         },
       ],
     });
@@ -84,12 +86,14 @@ describe("HttpError.BadRequest", () => {
           "Content-Type": "application/json",
         },
         body: "{ invalidJson: true ",
-      }),
+      })
     );
     const json = await res.json();
 
     expect(res.status).toBe(400);
-    expect(res.headers.get("Content-Type")).toBe("application/problem+json; charset=utf-8");
+    expect(res.headers.get("Content-Type")).toBe(
+      "application/problem+json; charset=utf-8"
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/400",
       title: "Bad Request",
@@ -110,7 +114,9 @@ describe("HttpError.BadRequest", () => {
     const json = await res.json();
 
     expect(res.status).toBe(400);
-    expect(res.headers.get("Content-Type")).toBe("application/problem+json; charset=utf-8");
+    expect(res.headers.get("Content-Type")).toBe(
+      "application/problem+json; charset=utf-8"
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/400",
       title: "Bad Request",
@@ -132,7 +138,7 @@ describe("HttpError.BadRequest", () => {
         body: z.object({
           file: z.file(),
         }),
-      },
+      }
     );
 
     const jpegFile = new File(["dummy content"], "photo.jpg", {
@@ -145,12 +151,14 @@ describe("HttpError.BadRequest", () => {
       new Request("http://localhost/upload", {
         method: "POST",
         body: formData,
-      }),
+      })
     );
 
     const json = await res.json();
     expect(res.status).toBe(400);
-    expect(res.headers.get("Content-Type")).toBe("application/problem+json; charset=utf-8");
+    expect(res.headers.get("Content-Type")).toBe(
+      "application/problem+json; charset=utf-8"
+    );
     expect(json).toEqual({
       type: "https://httpstatuses.com/400",
       title: "Bad Request",

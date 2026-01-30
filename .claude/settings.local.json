@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(bun test:*)"
-    ]
+    "allow": ["Bash(bun test:*)"]
   }
 }

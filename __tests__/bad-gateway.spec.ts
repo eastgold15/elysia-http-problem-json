@@ -1,6 +1,6 @@
-import { expect, describe, it } from "bun:test";
-import { HttpError } from "../src/errors";
+import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
+import { HttpError } from "../src/errors";
 import { httpProblemJsonPlugin } from "../src/index";
 
 describe("httpProblemJsonPlugin", () => {
@@ -18,7 +18,7 @@ describe("httpProblemJsonPlugin", () => {
     expect(res.status).toBe(502);
     // 验证标准 Header
     expect(res.headers.get("Content-Type")).toBe(
-      "application/problem+json; charset=utf-8",
+      "application/problem+json; charset=utf-8"
     );
 
     // 验证 RFC 核心字段
@@ -37,7 +37,7 @@ describe("httpProblemJsonPlugin", () => {
       .use(
         httpProblemJsonPlugin({
           typeBaseUrl: "https://api.myapp.com/errors",
-        }),
+        })
       )
       .get("/error", () => {
         throw new HttpError.NotFound("User not found");

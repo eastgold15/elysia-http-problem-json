@@ -61,7 +61,8 @@
         "noParameterProperties": "off",
         "useConsistentMemberAccessibility": "off",
         "useImportType": "off",
-        "useCollapsedElseIf": "off"
+        "useCollapsedElseIf": "off",
+        "useDefaultParameterLast": "off"
       },
       // 正确性规则
       "correctness": {
