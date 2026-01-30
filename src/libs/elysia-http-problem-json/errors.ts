@@ -1,3 +1,15 @@
+// src/libs/elysia-http-problem-json/errors.ts
+
+export interface ProblemDocument {
+  type: string;
+  title: string;
+  status?: number;
+  detail?: string;
+  instance?: string;
+  [key: string]: unknown;
+}
+
+
 /**
  * RFC 9457 Problem Details Error Base Class
  *
@@ -12,82 +24,63 @@
  * Extension members: Additional properties can be added to provide more context.
  * These are serialized as-is in the JSON response.
  */
+/**
+ * RFC 9457 Error Base Class
+ * * 修改思路：直接使用 public readonly 属性，拒绝嵌套，拒绝 Getter。
+ */
 export class ProblemError extends Error {
-  type: string;
-  title: string;
-  status: number;
-  detail?: string;
-  instance?: string;
-  // RFC 9457 extension members - allows additional custom fields
-  [key: string]: any;
+  // 1. 直接声明公开属性
+  public readonly status: number;
+  public readonly title: string;
+  public readonly type: string;
+  public readonly detail?: string;
+  public readonly instance?: string;
+  public readonly extensions?: Record<string, unknown>;
 
   constructor(
-    type = "about:blank",
+    type: string = "about:blank",
     title: string,
     status: number,
     detail?: string,
     instance?: string,
-    extensions?: Record<string, any>
+    extensions: Record<string, unknown> = {}
   ) {
     super(detail || title);
     Object.setPrototypeOf(this, ProblemError.prototype);
-    this.type = type;
-    this.title = title;
+
+    // 2. 直接赋值给 this
     this.status = status;
+    this.title = title;
+    this.type = type;
     this.detail = detail;
     this.instance = instance;
-
-    // Copy extension members to the error instance
-    if (extensions) {
-      Object.assign(this, extensions);
-    }
+    this.extensions = extensions;
   }
-  toJSON(): Record<string, any> {
-    const {
-      type,
-      title,
-      status,
-      detail,
-      instance,
-      name,
-      stack,
-      message,
-      ...extensions
-    } = this;
-    const result: Record<string, any> = {
-      type,
-      title,
-      status,
-      ...(detail && { detail }),
-      ...(instance && { instance }),
+
+  // 3. toJSON 的时候动态组装一下即可
+  toJSON(): ProblemDocument {
+    return {
+      type: this.type,
+      title: this.title,
+      status: this.status,
+      ...(this.detail ? { detail: this.detail } : {}),
+      ...(this.instance ? { instance: this.instance } : {}),
+      // 把扩展字段展开 (extensions)
+      ...this.extensions,
     };
-    return { ...result, ...extensions };
   }
 }
 
-// 40X Errors
+// --- 40X Errors ---
 class BadRequest extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super(
-      "https://httpstatuses.com/400",
-      "Bad Request",
-      400,
-      detail,
-      undefined,
-      extensions
-    );
+    super("https://httpstatuses.com/400", "Bad Request", 400, detail, undefined, extensions);
   }
 }
 
 class Unauthorized extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
     super("https://httpstatuses.com/401", "Unauthorized", 401, detail, undefined, extensions);
-  }
-}
-
-class PaymentRequired extends ProblemError {
-  constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/402", "Payment Required", 402, detail, undefined, extensions);
   }
 }
 
@@ -103,6 +96,18 @@ class NotFound extends ProblemError {
   }
 }
 
+class Conflict extends ProblemError {
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/409", "Conflict", 409, detail, undefined, extensions);
+  }
+}
+
+class PaymentRequired extends ProblemError {
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/402", "Payment Required", 402, detail, undefined, extensions);
+  }
+}
+
 class MethodNotAllowed extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
     super("https://httpstatuses.com/405", "Method Not Allowed", 405, detail, undefined, extensions);
@@ -115,11 +120,6 @@ class NotAcceptable extends ProblemError {
   }
 }
 
-class Conflict extends ProblemError {
-  constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/409", "Conflict", 409, detail, undefined, extensions);
-  }
-}
 
 // 50X Errors
 class InternalServerError extends ProblemError {
