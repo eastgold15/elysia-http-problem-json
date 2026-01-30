@@ -1,6 +1,6 @@
 # elysia-http-problem-json
 
-A simple plugin for Elysia that turns errors into RFC 7807 Problem Details JSON responses.
+A simple plugin for Elysia that turns errors into **RFC 9457** Problem Details JSON responses.
 
 ## Install
 
@@ -32,7 +32,7 @@ const app = new Elysia()
   .listen(3000)
 ```
 
-**Returns [RFC 7807](https://tools.ietf.org/html/rfc7807) Problem Details:**
+**Returns [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) Problem Details:**
 ```json
 {
   "type": "https://httpstatuses.com/404",
@@ -45,9 +45,49 @@ const app = new Elysia()
 ## Features
 
 - **Auto-converts Elysia errors** – ValidationError, NotFoundError, InvalidCookieSignature, and more
-- **Throw custom errors** – Clean HttpError classes for all common status codes  
-- **RFC 7807 compliant** – Standard Problem Details JSON format  
+- **Throw custom errors** – Clean HttpError classes for all common status codes
+- **RFC 9457 compliant** – Standard Problem Details JSON format with proper Content-Type header
 - **Extensions supported** – Add custom fields to error responses
+- **Custom error type URLs** – Configure base URL for error documentation links
+
+## Configuration
+
+### Basic Usage
+
+```typescript
+import { Elysia } from 'elysia'
+import { httpProblemJsonPlugin } from 'elysia-http-problem-json'
+
+const app = new Elysia()
+  .use(httpProblemJsonPlugin())
+  .get('/user/:id', ({ params }) => {
+    const user = db.findUser(params.id)
+    if (!user) throw new HttpError.NotFound('User not found')
+    return user
+  })
+```
+
+### Custom Type Base URL
+
+Configure a custom base URL for error type URIs:
+
+```typescript
+const app = new Elysia()
+  .use(httpProblemJsonPlugin({
+    typeBaseUrl: 'https://api.example.com/errors'
+  }))
+  .get('/user/:id', () => {
+    throw new HttpError.NotFound('User not found')
+  })
+
+// Response will include:
+// {
+//   "type": "https://api.example.com/errors/404",
+//   "title": "Not Found",
+//   "status": 404,
+//   "detail": "User not found"
+// }
+```
 
 ## Available Error Types
 
@@ -95,6 +135,16 @@ const app = new Elysia()
   "detail": "Database connection failed"
 }
 ```
+
+## RFC 9457 Compliance
+
+This plugin is fully compliant with [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) (formerly RFC 7807):
+
+- **Proper Content-Type**: All error responses use `application/problem+json` as specified in Section 6
+- **Core members**: Includes all standard fields (type, title, status, detail, instance)
+- **Extension members**: Supports custom fields while preventing conflicts with standard fields
+- **Type URI defaults**: When type is omitted, defaults to "about:blank" per the specification
+- **Absolute URI support**: Encourages using absolute URIs for type references to error documentation
 
 ## License
 

@@ -15,7 +15,8 @@
     "prepare": "husky || true",
     "prepublishOnly": "HUSKY=0 && bun test && bun tsc",
     "build": "rm -rf dist && bun build src/index.ts --outdir ./dist --target bun --minify --external elysia && tsc",
-    "lint": "biome lint --fix && biome format --fix"
+    "lint": "biome lint --fix && biome format --fix",
+    "test": "bun test"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

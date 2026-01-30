@@ -10,7 +10,13 @@
     "ignore": ["node_modules"],
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useDefaultParameterLast": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
+      }
     }
   },
   "formatter": {

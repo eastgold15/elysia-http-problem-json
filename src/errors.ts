@@ -1,54 +1,81 @@
+/**
+ * RFC 9457 Problem Details Error Base Class
+ *
+ * Core members as per RFC 9457:
+ * - type: A URI reference [RFC3986] that identifies the problem type.
+ *         Defaults to "about:blank" when omitted.
+ * - title: A short, human-readable summary of the problem type.
+ * - status: The HTTP status code ([RFC7231], Section 6).
+ * - detail: A human-readable explanation specific to this occurrence of the problem.
+ * - instance: A URI reference that identifies the specific occurrence of the problem.
+ *
+ * Extension members: Additional properties can be added to provide more context.
+ * These are serialized as-is in the JSON response.
+ */
 export class ProblemError extends Error {
   type: string;
   title: string;
   status: number;
   detail?: string;
   instance?: string;
+  // RFC 9457 extension members - allows additional custom fields
+  [key: string]: any;
 
   constructor(
-    type: string,
+    type = "about:blank",
     title: string,
     status: number,
     detail?: string,
     instance?: string,
+    extensions?: Record<string, any>,
   ) {
     super(detail || title);
+    Object.setPrototypeOf(this, ProblemError.prototype);
     this.type = type;
     this.title = title;
     this.status = status;
     this.detail = detail;
     this.instance = instance;
-  }
 
-  toJSON() {
-    return {
-      type: this.type,
-      title: this.title,
-      status: this.status,
-      ...(this.detail && { detail: this.detail }),
-      ...(this.instance && { instance: this.instance }),
+    // Copy extension members to the error instance
+    if (extensions) {
+      Object.assign(this, extensions);
+    }
+  }
+  toJSON(): Record<string, any> {
+    const {
+      type,
+      title,
+      status,
+      detail,
+      instance,
+      name,
+      stack,
+      message,
+      ...extensions
+    } = this;
+    const result: Record<string, any> = {
+      type,
+      title,
+      status,
+      ...(detail && { detail }),
+      ...(instance && { instance }),
     };
+    return { ...result, ...extensions };
   }
 }
 
 // 40X Errors
 class BadRequest extends ProblemError {
-  // biome-ignore lint/suspicious/noExplicitAny: we'll fix later
-  extensions?: Record<string, any>;
-
-  // biome-ignore lint/suspicious/noExplicitAny: we'll fix later
-  constructor(message: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/400", "Bad Request", 400, message);
-
-    this.extensions = extensions;
-  }
-
-  toJSON() {
-    const base = super.toJSON();
-    return {
-      ...base,
-      ...(this.extensions && this.extensions),
-    };
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super(
+      "https://httpstatuses.com/400",
+      "Bad Request",
+      400,
+      detail,
+      undefined,
+      extensions,
+    );
   }
 }
 
