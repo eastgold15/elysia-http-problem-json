@@ -1,12 +1,11 @@
 {
-  "name": "@pori15/elysia-http-problem-json",
+  "name": "@pori15/elysia-unified-error",
   "version": "0.2.3",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -15,9 +14,7 @@
   ],
   "scripts": {
     "prepare": "husky || true",
-    "prepublishOnly": "HUSKY=0 && bun test && bun tsc",
-    "build1": "rm -rf dist && bun build src/index.ts --outdir ./dist --target bun --minify --external elysia && tsc",
-    "build": "pkgroll",
+    "build": "rm -rf dist && pkgroll && bun link",
     "test": "bun test",
     "check": "ultracite check",
     "fix": "ultracite fix",
@@ -25,19 +22,16 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.12",
-    "@elysiajs/eden": "^1.4.4",
     "@types/bun": "latest",
     "husky": "^9.1.7",
     "ultracite": "7.1.1",
-    "zod": "^4.1.12",
-    "pkgroll": "^2.22.0"
+    "pkgroll": "^2.22.0",
+    "elysia": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0",
-    "elysia": ">=1.4.11"
-  },
-  "optionalDependencies": {
-    "chalk": "^5.3.0"
+    "elysia": ">=1.4.11",
+    "consola": "^3.4.2"
   },
   "keywords": [
     "elysia",
@@ -50,8 +44,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/pori15/elysia-http-problem-json"
-  },
-  "dependencies": {
-    "consola": "^3.4.2"
   }
 }

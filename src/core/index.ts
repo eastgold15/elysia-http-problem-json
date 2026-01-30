@@ -2,17 +2,14 @@
 
 import { Elysia } from "elysia";
 import { HttpError, ProblemError } from "./errors";
-import type { HttpProblemJsonOptions, ErrorContext } from "./types";
+import { ErrorContext, HttpProblemJsonOptions } from "./types";
 
-// 统一导出
-export * from "./errors";
-export * from "./types";
 
 export function httpProblemJsonPlugin(options: HttpProblemJsonOptions = {}) {
   return new Elysia({ name: "elysia-http-problem-json" })
     .error({ PROBLEM_ERROR: ProblemError })
     .onError({ as: "global" }, ({ code, error, path, set, request }) => {
-      
+
       const context: ErrorContext = { request, path, code, error };
       let problem: ProblemError | undefined | null;
 
@@ -34,7 +31,7 @@ export function httpProblemJsonPlugin(options: HttpProblemJsonOptions = {}) {
         // 如果已经是标准错误，直接用
         if (error instanceof ProblemError) {
           problem = error;
-        } 
+        }
         // 处理 Elysia 内置错误
         else {
           switch (code) {

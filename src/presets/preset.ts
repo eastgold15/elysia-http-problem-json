@@ -11,11 +11,13 @@
  * @module
  */
 
-import { httpProblemJsonPlugin } from "../../libs/elysia-http-problem-json/index";
+
+import { httpProblemJsonPlugin } from "../core";
 import { isDatabaseError } from "./hooks/db/guards";
 import { mapDatabaseError } from "./hooks/db/mapper";
 import { logErrorWithConsola } from "./hooks/logger/console";
-
+export type { DrizzleError } from "./hooks/db/guards";
+export * from "./hooks/logger/console";
 /**
  * 配置选项
  */
@@ -99,10 +101,6 @@ export const standardErrorSuite = (options: StandardErrorSuiteOptions = {}) => {
   });
 };
 
-/**
- * 导出别名 (可选)
- */
-export { standardErrorSuite as createStandardErrorSuite };
 
 /**
  * 导出原子钩子，允许高级用户手动组装

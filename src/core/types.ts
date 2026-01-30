@@ -1,5 +1,7 @@
 // src/libs/elysia-http-problem-json/types.ts
-import type { HttpError, ProblemError } from "./errors";
+
+import { HttpError, ProblemError } from "./errors";
+
 type Code = number | "PROBLEM_ERROR" | "UNKNOWN" | "VALIDATION" | "NOT_FOUND" | "PARSE" | "INTERNAL_SERVER_ERROR" | "INVALID_COOKIE_SIGNATURE" | "INVALID_FILE_TYPE"
 
 
