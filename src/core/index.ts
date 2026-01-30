@@ -90,6 +90,9 @@ export function unifiedErrorPlugin(options: HttpProblemJsonOptions = {}) {
         void options.onBeforeRespond(problem, context);
       }
 
+      // 设置状态码，让日志插件能正确记录
+      set.status = json.status;
+
       // 返回 Response
       return new Response(JSON.stringify(json), {
         status: json.status,
