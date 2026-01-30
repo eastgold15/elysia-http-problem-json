@@ -242,3 +242,27 @@ This plugin is fully compliant with [RFC 9457](https://www.rfc-editor.org/rfc/rf
 ## License
 
 MIT
+
+
+
+```
+src/
+├── libs/
+│   └── elysia-http-problem-json/  <-- [核心插件] 纯净、无业务依赖、通用
+│       ├── index.ts               # 插件入口
+│       ├── types.ts               # 类型定义 (Hooks, Options)
+│       └── errors.ts              # HttpError, ProblemError 基类
+│
+├── framework/
+│   └── error-system/              <-- [业务层] 具体的实现逻辑
+│       ├── hooks/
+│       │   ├── db/                # [数据库钩子]
+│       │   │   ├── guards.ts      # 类型守卫 (isDatabaseError)
+│       │   │   └── mapper.ts      # 错误映射 (Code -> HttpError)
+│       │   └── logger/            # [日志钩子]
+│       │       └── console.ts     # Chalk 美化打印
+│       │
+│       └── preset.ts              # [预设封装] 组装插件和钩子，导出 standardErrorSuite
+│
+└── ... (业务代码)
+```
