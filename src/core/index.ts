@@ -4,12 +4,10 @@ import { Elysia } from "elysia";
 import { HttpError, ProblemError } from "./errors";
 import { ErrorContext, HttpProblemJsonOptions } from "./types";
 
-
 export function unifiedErrorPlugin(options: HttpProblemJsonOptions = {}) {
   return new Elysia({ name: "elysia-http-problem-json" })
     .error({ PROBLEM_ERROR: ProblemError })
     .onError({ as: "global" }, ({ code, error, path, set, request }) => {
-
       const context: ErrorContext = { request, path, code, error };
       let problem: ProblemError | undefined | null;
 
@@ -51,15 +49,21 @@ export function unifiedErrorPlugin(options: HttpProblemJsonOptions = {}) {
               problem = new HttpError.NotFound(`Resource not found: ${path}`);
               break;
             case "PARSE":
-              problem = new HttpError.BadRequest(`Parse error: ${error.message}`);
+              problem = new HttpError.BadRequest(
+                `Parse error: ${error.message}`
+              );
               break;
             case "INVALID_COOKIE_SIGNATURE":
-              problem = new HttpError.BadRequest("Invalid cookie signature", { key: (error as any).key });
+              problem = new HttpError.BadRequest("Invalid cookie signature", {
+                key: (error as any).key,
+              });
               break;
-            default:
-              const message = error instanceof Error ? error.message : String(error);
+            default: {
+              const message =
+                error instanceof Error ? error.message : String(error);
               problem = new HttpError.InternalServerError(message);
               break;
+            }
           }
         }
       }
@@ -71,7 +75,10 @@ export function unifiedErrorPlugin(options: HttpProblemJsonOptions = {}) {
       json.instance = path;
 
       // 处理 typeBaseUrl
-      if (options.typeBaseUrl && (json.type === "about:blank" || json.type.includes("httpstatuses.com"))) {
+      if (
+        options.typeBaseUrl &&
+        (json.type === "about:blank" || json.type.includes("httpstatuses.com"))
+      ) {
         json.type = `${options.typeBaseUrl}/${json.status}`;
       }
 

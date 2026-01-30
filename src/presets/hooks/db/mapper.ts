@@ -13,11 +13,8 @@
  * - 58000: System error (disk full, etc.)
  */
 
-
 import { HttpError } from "../../../core/errors";
 import { DrizzleError, getPostgresError } from "./guards";
-
-
 
 /**
  * Maps a database error to an appropriate HTTP error.
@@ -25,9 +22,9 @@ import { DrizzleError, getPostgresError } from "./guards";
  * @param error - Unknown error that has been identified as a database error
  * @returns A ProblemError instance with appropriate status code and message
  */
-export function mapDatabaseError(error: DrizzleError): InstanceType<
-  (typeof HttpError)[keyof typeof HttpError]
-> {
+export function mapDatabaseError(
+  error: DrizzleError
+): InstanceType<(typeof HttpError)[keyof typeof HttpError]> {
   const pgError = getPostgresError(error);
   // ✅ 2. 这里的属性都有自动补全了，不再需要 ?. 瞎猜
   const { code, detail, constraint, message: rawMsg } = pgError;
@@ -37,8 +34,6 @@ export function mapDatabaseError(error: DrizzleError): InstanceType<
     "x-pg-code": code,
     "x-constraint": constraint,
   };
-
-
 
   switch (code) {
     // === Integrity Constraint Violations (23xxx) ===
@@ -79,10 +74,7 @@ export function mapDatabaseError(error: DrizzleError): InstanceType<
 
     case "40001": {
       // Serialization failure
-      return new HttpError.ServiceUnavailable(
-        "事务冲突，请重试",
-        extensions
-      );
+      return new HttpError.ServiceUnavailable("事务冲突，请重试", extensions);
     }
 
     case "40P01": {

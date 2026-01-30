@@ -2,10 +2,16 @@
 
 import { HttpError, ProblemError } from "./errors";
 
-type Code = number | "PROBLEM_ERROR" | "UNKNOWN" | "VALIDATION" | "NOT_FOUND" | "PARSE" | "INTERNAL_SERVER_ERROR" | "INVALID_COOKIE_SIGNATURE" | "INVALID_FILE_TYPE"
-
-
-
+type Code =
+  | number
+  | "PROBLEM_ERROR"
+  | "UNKNOWN"
+  | "VALIDATION"
+  | "NOT_FOUND"
+  | "PARSE"
+  | "INTERNAL_SERVER_ERROR"
+  | "INVALID_COOKIE_SIGNATURE"
+  | "INVALID_FILE_TYPE";
 
 // 获取 HttpError 对象的所有 Key (例如 "BadRequest" | "NotFound")
 export type HttpErrorType = keyof typeof HttpError;

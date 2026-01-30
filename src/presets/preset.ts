@@ -11,11 +11,11 @@
  * @module
  */
 
-
 import { unifiedErrorPlugin } from "../core";
 import { isDatabaseError } from "./hooks/db/guards";
 import { mapDatabaseError } from "./hooks/db/mapper";
 import { logErrorWithConsola } from "./hooks/logger/console";
+
 export type { DrizzleError } from "./hooks/db/guards";
 export * from "./hooks/logger/console";
 /**
@@ -92,15 +92,11 @@ export const standardErrorSuite = (options: StandardErrorSuiteOptions = {}) => {
     onBeforeRespond: (problem, ctx) => {
       // 判断开关
       if (logging || forceLogging) {
-        logErrorWithConsola(
-          problem,
-          ctx
-        );
+        logErrorWithConsola(problem, ctx);
       }
     },
   });
 };
-
 
 /**
  * 导出原子钩子，允许高级用户手动组装

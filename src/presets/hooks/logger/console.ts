@@ -1,7 +1,7 @@
 import { consola } from "consola";
 import { colors } from "consola/utils";
-import { ErrorContext } from "../../../core/types";
 import { ProblemError } from "../../../core/errors";
+import { ErrorContext } from "../../../core/types";
 import { getPostgresError, isDatabaseError } from "../db/guards";
 
 // 状态码颜色映射
@@ -50,7 +50,9 @@ function createFileLink(filePath: string, line: number): string {
 }
 
 // 解析堆栈行
-function parseStackLine(line: string): { filePath: string; line: number; column: number; func: string } | null {
+function parseStackLine(
+  line: string
+): { filePath: string; line: number; column: number; func: string } | null {
   // Windows: at functionName (C:\path\to\file.ts:123:45)
   const match = line.match(
     /at\s+(?:(.+?)\s+)?\((.+?):(\d+):(\d+)\)|at\s+(.+?):(\d+):(\d+)$/
@@ -62,8 +64,8 @@ function parseStackLine(line: string): { filePath: string; line: number; column:
 
   return {
     filePath: path1 || path2 || "",
-    line: parseInt(line1 || line2 || "0", 10),
-    column: parseInt(col1 || col2 || "0", 10),
+    line: Number.parseInt(line1 || line2 || "0", 10),
+    column: Number.parseInt(col1 || col2 || "0", 10),
     func: func?.trim() || "",
   };
 }
@@ -71,11 +73,7 @@ function parseStackLine(line: string): { filePath: string; line: number; column:
 /**
  * 使用 Consola 打印漂亮的错误日志（统一分块框架风格 + 可点击堆栈）
  */
-export function logErrorWithConsola(
-  problem: ProblemError,
-  ctx: ErrorContext
-) {
-
+export function logErrorWithConsola(problem: ProblemError, ctx: ErrorContext) {
   if (process.env.NODE_ENV === "production") return;
 
   const { request, path, error } = ctx;
@@ -110,10 +108,13 @@ export function logErrorWithConsola(
         colors.gray(pgErr.message),
         "",
         colors.dim("Query:   ") + colors.cyan(error.query || "N/A"),
-        colors.dim("Params: ") + colors.yellow(JSON.stringify(error.params ?? "N/A")),
+        colors.dim("Params: ") +
+          colors.yellow(JSON.stringify(error.params ?? "N/A")),
         stackInfo,
-      ].filter(Boolean).join("\n"),
-      style: { borderColor: "red" }
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      style: { borderColor: "red" },
     });
     return;
   }
@@ -131,14 +132,20 @@ export function logErrorWithConsola(
       message: [
         colors.yellow("Validation Failed"),
         "",
-        ...errors.map((err, idx) => [
-          colors.red(`Field ${idx + 1}:`),
-          colors.dim("  Path:   ") + colors.cyan(err.path || "N/A"),
-          colors.dim("  Message:") + " " + colors.white(err.message),
-          err.value !== undefined && colors.dim("  Value:   ") + colors.yellow(JSON.stringify(err.value)),
-        ].filter(Boolean).join("\n"))
+        ...errors.map((err, idx) =>
+          [
+            colors.red(`Field ${idx + 1}:`),
+            colors.dim("  Path:   ") + colors.cyan(err.path || "N/A"),
+            colors.dim("  Message:") + " " + colors.white(err.message),
+            err.value !== undefined &&
+              colors.dim("  Value:   ") +
+                colors.yellow(JSON.stringify(err.value)),
+          ]
+            .filter(Boolean)
+            .join("\n")
+        ),
       ].join("\n"),
-      style: { borderColor: status >= 500 ? "red" : "yellow" }
+      style: { borderColor: status >= 500 ? "red" : "yellow" },
     });
     return;
   }
@@ -148,9 +155,7 @@ export function logErrorWithConsola(
   const borderColor = isServerError ? "red" : "yellow";
   const titleColor = isServerError ? colors.red : colors.yellow;
 
-  const messageLines: string[] = [
-    titleColor(problem.title),
-  ];
+  const messageLines: string[] = [titleColor(problem.title)];
 
   // 添加 detail
   if (problem.detail && problem.detail !== problem.title) {
@@ -159,8 +164,9 @@ export function logErrorWithConsola(
 
   // 添加扩展字段（除了 errors）
   if (problem.extensions) {
-    const otherExtensions = Object.entries(problem.extensions)
-      .filter(([key]) => key !== "errors");
+    const otherExtensions = Object.entries(problem.extensions).filter(
+      ([key]) => key !== "errors"
+    );
 
     if (otherExtensions.length > 0) {
       messageLines.push("");
@@ -177,9 +183,12 @@ export function logErrorWithConsola(
     const stackLines = error.stack
       .split("\n")
       .slice(1)
-      .filter((line) =>
-        !line.includes("node_modules") &&
-        !line.includes("elysia-http-problem-json")
+      .filter(
+        (line) =>
+          !(
+            line.includes("node_modules") ||
+            line.includes("elysia-http-problem-json")
+          )
       )
       .slice(0, 8);
 
@@ -201,6 +210,6 @@ export function logErrorWithConsola(
   consola.box({
     title: `${statusColor(`[HTTP ${status}]`)} ${methodColor(method)} ${path}`,
     message: messageLines.join("\n"),
-    style: { borderColor }
+    style: { borderColor },
   });
 }

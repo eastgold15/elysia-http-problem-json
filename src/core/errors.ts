@@ -9,7 +9,6 @@ export interface ProblemDocument {
   [key: string]: unknown;
 }
 
-
 /**
  * RFC 9457 Problem Details Error Base Class
  *
@@ -38,7 +37,7 @@ export class ProblemError extends Error {
   public readonly extensions?: Record<string, unknown>;
 
   constructor(
-    type: string = "about:blank",
+    type = "about:blank",
     title: string,
     status: number,
     detail?: string,
@@ -74,52 +73,107 @@ export class ProblemError extends Error {
 // --- 40X Errors ---
 class BadRequest extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/400", "Bad Request", 400, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/400",
+      "Bad Request",
+      400,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class Unauthorized extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/401", "Unauthorized", 401, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/401",
+      "Unauthorized",
+      401,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class Forbidden extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/403", "Forbidden", 403, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/403",
+      "Forbidden",
+      403,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class NotFound extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/404", "Not Found", 404, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/404",
+      "Not Found",
+      404,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class Conflict extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/409", "Conflict", 409, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/409",
+      "Conflict",
+      409,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class PaymentRequired extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/402", "Payment Required", 402, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/402",
+      "Payment Required",
+      402,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class MethodNotAllowed extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/405", "Method Not Allowed", 405, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/405",
+      "Method Not Allowed",
+      405,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class NotAcceptable extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/406", "Not Acceptable", 406, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/406",
+      "Not Acceptable",
+      406,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
-
 
 // 50X Errors
 class InternalServerError extends ProblemError {
@@ -137,13 +191,27 @@ class InternalServerError extends ProblemError {
 
 class NotImplemented extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/501", "Not Implemented", 501, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/501",
+      "Not Implemented",
+      501,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class BadGateway extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/502", "Bad Gateway", 502, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/502",
+      "Bad Gateway",
+      502,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
@@ -162,7 +230,14 @@ class ServiceUnavailable extends ProblemError {
 
 class GatewayTimeout extends ProblemError {
   constructor(detail?: string, extensions?: Record<string, any>) {
-    super("https://httpstatuses.com/504", "Gateway Timeout", 504, detail, undefined, extensions);
+    super(
+      "https://httpstatuses.com/504",
+      "Gateway Timeout",
+      504,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 

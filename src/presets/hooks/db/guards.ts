@@ -17,7 +17,6 @@
  * - 58xxx: System Error
  */
 
-
 const POSTGRES_ERROR_CODE_REGEX = /^[0-9A-Z]{5}$/;
 
 // 1. 定义 Drizzle 抛出的外层错误结构
@@ -30,20 +29,18 @@ export interface DrizzleError extends Error {
   cause: PostgresError;
 }
 
-
-
 // 2. 定义内层的原始 PostgreSQL 错误结构
 export interface PostgresError {
   name: string;
   severity:
-  | "ERROR"
-  | "FATAL"
-  | "PANIC"
-  | "WARNING"
-  | "NOTICE"
-  | "DEBUG"
-  | "INFO"
-  | "LOG";
+    | "ERROR"
+    | "FATAL"
+    | "PANIC"
+    | "WARNING"
+    | "NOTICE"
+    | "DEBUG"
+    | "INFO"
+    | "LOG";
   code: string; // SQLSTATE (e.g., "23503")
   detail?: string;
   hint?: string;
@@ -63,14 +60,6 @@ export interface PostgresError {
   stack: string;
   message: string;
 }
-
-
-
-
-
-
-
-
 
 /**
  * 类型守卫：判断是否为 Drizzle/Postgres 数据库错误
@@ -96,7 +85,6 @@ export function isDatabaseError(error: unknown): error is DrizzleError {
   return POSTGRES_ERROR_CODE_REGEX.test(cause.code);
 }
 
-
 /**
  * 辅助函数：直接提取内部的 PostgresError
  * 只有通过了 isDatabaseError 检查才应该调用此函数
@@ -104,14 +92,6 @@ export function isDatabaseError(error: unknown): error is DrizzleError {
 export function getPostgresError(error: DrizzleError): PostgresError {
   return error.cause;
 }
-
-
-
-
-
-
-
-
 
 /**
  * PostgreSQL Error Code Reference

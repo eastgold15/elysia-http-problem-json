@@ -4,10 +4,10 @@
  * 测试 standardErrorSuite 插件的各种场景
  */
 
-import { describe, expect, it, beforeAll, afterAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
-import { HttpError } from "../src/libs/elysia-http-problem-json/errors";
 import { standardErrorSuite } from "../src/framework/error-system/preset";
+import { HttpError } from "../src/libs/elysia-http-problem-json/errors";
 
 // Drizzle 错误类型
 interface DrizzleError extends Error {
@@ -28,10 +28,12 @@ describe("standardErrorSuite", () => {
 
   beforeAll(() => {
     app = new Elysia()
-      .use(standardErrorSuite({
-        typeBaseUrl: "https://api.example.com/errors",
-        logging: false, // 测试时关闭日志
-      }))
+      .use(
+        standardErrorSuite({
+          typeBaseUrl: "https://api.example.com/errors",
+          logging: false, // 测试时关闭日志
+        })
+      )
       .get("/ok", () => ({ message: "ok" }))
       .get("/not-found", () => {
         throw new HttpError.NotFound("Resource not found");

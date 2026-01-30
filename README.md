@@ -1,268 +1,219 @@
-# elysia-http-problem-json
+# @pori15/elysia-unified-error
 
-A simple plugin for Elysia that turns errors into **RFC 9457** Problem Details JSON responses.
+A unified error handling plugin for Elysia that converts errors into **RFC 9457** Problem Details JSON responses with beautiful console logging and database error mapping support.
 
-## Install
+## 特性
+
+- **RFC 9457 标准响应** - 自动转换为 Problem Details JSON 格式
+- **漂亮的控制台日志** - 分盒式设计，可点击跳转（VS Code）
+- **数据库错误映射** - 自动将 PostgreSQL 错误码转换为 HTTP 错误
+- **自定义错误支持** - 完整的 HttpError 类集合
+- **扩展字段支持** - 可添加自定义字段到错误响应
+
+## 安装
 
 ```bash
-bun add elysia-http-problem-json
+bun add @pori15/elysia-unified-error
 ```
 
-## Quick Start
+## 快速开始
 
 ```typescript
-import { Elysia, t } from 'elysia'
-import { httpProblemJsonPlugin, HttpError } from 'elysia-http-problem-json'
+import { Elysia } from "elysia";
+import { unifiedErrorPlugin, HttpError } from "@pori15/elysia-unified-error";
 
 const app = new Elysia()
-  .use(httpProblemJsonPlugin())
-  .get('/user/:id', ({ params }) => {
-    const user = db.findUser(params.id)
-    if (!user) throw new HttpError.NotFound('User not found')
-    return user
+  .use(unifiedErrorPlugin())
+  .get("/user/:id", ({ params }) => {
+    const user = db.findUser(params.id);
+    if (!user) throw new HttpError.NotFound("User not found");
+    return user;
   })
-  .post('/user', ({ body }) => {
-    return createUser(body)
-  }, {
-    body: t.Object({
-      email: t.String({ format: 'email' }),
-      age: t.Number({ minimum: 18 })
-    })
-  })
-  .listen(3000)
+  .listen(3000);
 ```
 
-**Returns [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) Problem Details:**
+**错误响应格式：**
 ```json
 {
-  "type": "https://httpstatuses.com/404",
+  "type": "about:blank",
   "title": "Not Found",
   "status": 404,
-  "detail": "User not found"
+  "detail": "User not found",
+  "instance": "/user/123"
 }
 ```
 
-## Features
-
-- **Auto-converts Elysia errors** – ValidationError, NotFoundError, InvalidCookieSignature, and more
-- **Throw custom errors** – Clean HttpError classes for all common status codes
-- **RFC 9457 compliant** – Standard Problem Details JSON format with proper Content-Type header
-- **Extensions supported** – Add custom fields to error responses
-- **Custom error type URLs** – Configure base URL for error documentation links
-
-## Configuration
-
-### Basic Usage
+## 完整配置示例
 
 ```typescript
-import { Elysia } from 'elysia'
-import { httpProblemJsonPlugin } from 'elysia-http-problem-json'
+import { Elysia } from "elysia";
+import {
+  unifiedErrorPlugin,
+  HttpError,
+  isDatabaseError,
+  mapDatabaseError,
+  logErrorWithConsola
+} from "@pori15/elysia-unified-error";
 
 const app = new Elysia()
-  .use(httpProblemJsonPlugin())
-  .get('/user/:id', ({ params }) => {
-    const user = db.findUser(params.id)
-    if (!user) throw new HttpError.NotFound('User not found')
-    return user
-  })
-```
+  .use(unifiedErrorPlugin({
+    // 自定义错误转换
+    transform: (error) => {
+      if (isDatabaseError(error)) {
+        return mapDatabaseError(error);
+      }
+      return null;
+    },
 
-### Custom Type Base URL
+    // 响应前的钩子（用于日志记录）
+    onBeforeRespond: (problem, ctx) => {
+      if (process.env.NODE_ENV === "development") {
+        logErrorWithConsola(problem, ctx);
+      }
+    },
 
-Configure a custom base URL for error type URIs:
-
-```typescript
-const app = new Elysia()
-  .use(httpProblemJsonPlugin({
-    typeBaseUrl: 'https://api.example.com/errors'
+    // 自定义 type URL 前缀
+    typeBaseUrl: "https://api.example.com/errors"
   }))
-  .get('/user/:id', () => {
-    throw new HttpError.NotFound('User not found')
-  })
-
-// Response will include:
-// {
-//   "type": "https://api.example.com/errors/404",
-//   "title": "Not Found",
-//   "status": 404,
-//   "detail": "User not found"
-// }
+  .listen(3000);
 ```
 
-## Available Error Types
+## 可用错误类型
 
-- BadRequest (400)
-- Unauthorized (401)
-- PaymentRequired (402)
-- Forbidden (403)
-- NotFound (404)
-- MethodNotAllowed (405)
-- NotAcceptable (406)
-- Conflict (409)
-- InternalServerError (500)
-- NotImplemented (501)
-- BadGateway (502)
-- ServiceUnavailable (503)
-- GatewayTimeout (504)
+### 4xx 客户端错误
 
-## Using Extensions
+| 错误类 | 状态码 | 说明 |
+|--------|--------|------|
+| `HttpError.BadRequest` | 400 | 错误的请求 |
+| `HttpError.Unauthorized` | 401 | 未授权 |
+| `HttpError.PaymentRequired` | 402 | 需要付款 |
+| `HttpError.Forbidden` | 403 | 禁止访问 |
+| `HttpError.NotFound` | 404 | 未找到 |
+| `HttpError.MethodNotAllowed` | 405 | 方法不允许 |
+| `HttpError.NotAcceptable` | 406 | 不可接受 |
+| `HttpError.Conflict` | 409 | 冲突 |
 
-All error types support an optional `extensions` parameter to add custom fields to your error responses. This is useful for providing additional context that helps clients handle errors more effectively.
+### 5xx 服务器错误
 
-### Basic Usage
+| 错误类 | 状态码 | 说明 |
+|--------|--------|------|
+| `HttpError.InternalServerError` | 500 | 内部服务器错误 |
+| `HttpError.NotImplemented` | 501 | 未实现 |
+| `HttpError.BadGateway` | 502 | 坏网关 |
+| `HttpError.ServiceUnavailable` | 503 | 服务不可用 |
+| `HttpError.GatewayTimeout` | 504 | 网关超时 |
+
+## 使用扩展字段
+
+所有错误类型都支持 `extensions` 参数来添加自定义字段：
 
 ```typescript
-throw new HttpError.BadRequest('Invalid input', {
-  field: 'email',
-  code: 'INVALID_FORMAT'
-})
-
-// Response:
-// {
-//   "type": "https://httpstatuses.com/400",
-//   "title": "Bad Request",
-//   "status": 400,
-//   "detail": "Invalid input",
-//   "field": "email",
-//   "code": "INVALID_FORMAT"
-// }
-```
-
-### Common Use Cases
-
-**Validation Errors (400):**
-```typescript
-throw new HttpError.BadRequest('Validation failed', {
+throw new HttpError.BadRequest("Validation failed", {
   errors: [
-    { field: 'email', message: 'Invalid email format' },
-    { field: 'age', message: 'Must be at least 18' }
+    { path: "/email", message: "Invalid email format", value: "invalid" },
+    { path: "/age", message: "Must be at least 18", value: 15 }
   ]
-})
+});
 ```
 
-**Authentication (401):**
-```typescript
-throw new HttpError.Unauthorized('Authentication required', {
-  authType: 'Bearer',
-  realm: 'api.example.com'
-})
-```
-
-**Forbidden (403):**
-```typescript
-throw new HttpError.Forbidden('Insufficient permissions', {
-  required: ['admin', 'write'],
-  current: ['read'],
-  requestUrl: '/permissions/request'
-})
-```
-
-**Not Found (404):**
-```typescript
-throw new HttpError.NotFound('User not found', {
-  userId: '12345',
-  suggestedIds: ['12346', '12347']
-})
-```
-
-**Conflict (409):**
-```typescript
-throw new HttpError.Conflict('Email already exists', {
-  conflictingEmail: 'user@example.com',
-  existingUserId: 'abc123'
-})
-```
-
-**Internal Server Error (500):**
-```typescript
-throw new HttpError.InternalServerError('Database connection failed', {
-  code: 'DB_CONNECTION_ERROR',
-  requestId: 'req_abc123',
-  retryable: true
-})
-```
-
-**Service Unavailable (503):**
-```typescript
-throw new HttpError.ServiceUnavailable('Maintenance in progress', {
-  retryAfter: 3600,
-  maintenanceWindow: '02:00-04:00 UTC'
-})
-```
-
-**Gateway Timeout (504):**
-```typescript
-throw new HttpError.GatewayTimeout('Upstream service timeout', {
-  upstreamService: 'payment-api',
-  timeout: '30s'
-})
-```
-
-## Response Examples
-
-**Validation Error (400):**
+**响应：**
 ```json
 {
-  "type": "https://httpstatuses.com/400",
+  "type": "about:blank",
   "title": "Bad Request",
   "status": 400,
-  "detail": "The request is invalid",
+  "detail": "Validation failed",
   "errors": [
-    {
-      "code": "invalid_type",
-      "expected": "number",
-      "received": "string",
-      "path": ["age"],
-      "message": "Invalid input"
-    }
+    { "path": "/email", "message": "Invalid email format", "value": "invalid" },
+    { "path": "/age", "message": "Must be at least 18", "value": 15 }
   ]
 }
 ```
 
-**Internal Server Error (500):**
-```json
-{
-  "type": "https://httpstatuses.com/500",
-  "title": "Internal Server Error",
-  "status": 500,
-  "detail": "Database connection failed"
-}
+## 数据库错误映射
+
+自动将 PostgreSQL 错误码映射为 HTTP 错误：
+
+```typescript
+// UNIQUE 约束违反 (23505) → 409 Conflict
+// FOREIGN KEY 约束违反 (23503) → 400 Bad Request
+// NOT NULL 约束违反 (23502) → 400 Bad Request
 ```
 
-## RFC 9457 Compliance
+## 日志输出
 
-This plugin is fully compliant with [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) (formerly RFC 7807):
+开发环境下会自动输出漂亮的错误日志：
 
-- **Proper Content-Type**: All error responses use `application/problem+json` as specified in Section 6
-- **Core members**: Includes all standard fields (type, title, status, detail, instance)
-- **Extension members**: Supports custom fields while preventing conflicts with standard fields
-- **Type URI defaults**: When type is omitted, defaults to "about:blank" per the specification
-- **Absolute URI support**: Encourages using absolute URIs for type references to error documentation
+```
+┌─────────────────────────────────────────────┐
+│ [HTTP 500] GET /api/users                   │
+│                                             │
+│ Internal Server Error                       │
+│                                             │
+│ Stack:                                      │
+│   getUser src/index.ts:123                  │
+│           ^^^^^^^^^^^^^^^ 可点击             │
+└─────────────────────────────────────────────┘
+```
+
+- 盒式设计，边界框根据状态码着色
+- 相对路径显示，可点击跳转到对应行号
+- 自动过滤 node_modules 和插件本身的堆栈
+
+## 自动错误处理
+
+插件会自动处理以下 Elysia 内置错误：
+
+| 错误码 | 映射 |
+|--------|------|
+| `VALIDATION` | 400 Bad Request（带验证详情）|
+| `NOT_FOUND` | 404 Not Found |
+| `PARSE` | 400 Bad Request |
+| `INVALID_COOKIE_SIGNATURE` | 400 Bad Request |
+
+## API 参考
+
+### `unifiedErrorPlugin(options?)`
+
+创建统一错误处理插件。
+
+**选项：**
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `transform` | `(error, ctx) => ProblemError \| null` | - | 自定义错误转换函数 |
+| `onBeforeRespond` | `(problem, ctx) => void` | - | 响应前的回调（日志等）|
+| `typeBaseUrl` | `string` | - | 自定义 type URL 前缀 |
+
+### `isDatabaseError(error)`
+
+检查错误是否为数据库错误。
+
+### `mapDatabaseError(error)`
+
+将数据库错误映射为对应的 HttpError。
+
+### `logErrorWithConsola(problem, ctx)`
+
+打印漂亮的错误日志到控制台。
+
+## 示例项目
+
+查看 `example/` 目录获取完整示例：
+
+```bash
+cd example
+bun run dev
+```
+
+测试端点：
+- `/ok` - 正常响应
+- `/not-found` - 404 错误
+- `/bad-request` - 400 错误
+- `/validation-error` - 验证错误
+- `/db-unique-violation` - 数据库唯一约束冲突
+- `/db-foreign-key-violation` - 外键约束冲突
 
 ## License
 
 MIT
-
-
-
-```
-src/
-├── libs/
-│   └── elysia-http-problem-json/  <-- [核心插件] 纯净、无业务依赖、通用
-│       ├── index.ts               # 插件入口
-│       ├── types.ts               # 类型定义 (Hooks, Options)
-│       └── errors.ts              # HttpError, ProblemError 基类
-│
-├── framework/
-│   └── error-system/              <-- [业务层] 具体的实现逻辑
-│       ├── hooks/
-│       │   ├── db/                # [数据库钩子]
-│       │   │   ├── guards.ts      # 类型守卫 (isDatabaseError)
-│       │   │   └── mapper.ts      # 错误映射 (Code -> HttpError)
-│       │   └── logger/            # [日志钩子]
-│       │       └── console.ts     # Chalk 美化打印
-│       │
-│       └── preset.ts              # [预设封装] 组装插件和钩子，导出 standardErrorSuite
-│
-└── ... (业务代码)
-```

@@ -1,6 +1,7 @@
 // src/index.ts
-export * from "./core/index";
+
 export * from "./core/errors";
+export * from "./core/index";
 export * from "./core/types";
 
 // 导出所有“零件”
