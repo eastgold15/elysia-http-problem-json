@@ -105,6 +105,99 @@ const app = new Elysia()
 - ServiceUnavailable (503)
 - GatewayTimeout (504)
 
+## Using Extensions
+
+All error types support an optional `extensions` parameter to add custom fields to your error responses. This is useful for providing additional context that helps clients handle errors more effectively.
+
+### Basic Usage
+
+```typescript
+throw new HttpError.BadRequest('Invalid input', {
+  field: 'email',
+  code: 'INVALID_FORMAT'
+})
+
+// Response:
+// {
+//   "type": "https://httpstatuses.com/400",
+//   "title": "Bad Request",
+//   "status": 400,
+//   "detail": "Invalid input",
+//   "field": "email",
+//   "code": "INVALID_FORMAT"
+// }
+```
+
+### Common Use Cases
+
+**Validation Errors (400):**
+```typescript
+throw new HttpError.BadRequest('Validation failed', {
+  errors: [
+    { field: 'email', message: 'Invalid email format' },
+    { field: 'age', message: 'Must be at least 18' }
+  ]
+})
+```
+
+**Authentication (401):**
+```typescript
+throw new HttpError.Unauthorized('Authentication required', {
+  authType: 'Bearer',
+  realm: 'api.example.com'
+})
+```
+
+**Forbidden (403):**
+```typescript
+throw new HttpError.Forbidden('Insufficient permissions', {
+  required: ['admin', 'write'],
+  current: ['read'],
+  requestUrl: '/permissions/request'
+})
+```
+
+**Not Found (404):**
+```typescript
+throw new HttpError.NotFound('User not found', {
+  userId: '12345',
+  suggestedIds: ['12346', '12347']
+})
+```
+
+**Conflict (409):**
+```typescript
+throw new HttpError.Conflict('Email already exists', {
+  conflictingEmail: 'user@example.com',
+  existingUserId: 'abc123'
+})
+```
+
+**Internal Server Error (500):**
+```typescript
+throw new HttpError.InternalServerError('Database connection failed', {
+  code: 'DB_CONNECTION_ERROR',
+  requestId: 'req_abc123',
+  retryable: true
+})
+```
+
+**Service Unavailable (503):**
+```typescript
+throw new HttpError.ServiceUnavailable('Maintenance in progress', {
+  retryAfter: 3600,
+  maintenanceWindow: '02:00-04:00 UTC'
+})
+```
+
+**Gateway Timeout (504):**
+```typescript
+throw new HttpError.GatewayTimeout('Upstream service timeout', {
+  upstreamService: 'payment-api',
+  timeout: '30s'
+})
+```
+
 ## Response Examples
 
 **Validation Error (400):**

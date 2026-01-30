@@ -80,75 +80,89 @@ class BadRequest extends ProblemError {
 }
 
 class Unauthorized extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/401", "Unauthorized", 401, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/401", "Unauthorized", 401, detail, undefined, extensions);
   }
 }
 
 class PaymentRequired extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/402", "Payment Required", 402, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/402", "Payment Required", 402, detail, undefined, extensions);
   }
 }
 
 class Forbidden extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/403", "Forbidden", 403, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/403", "Forbidden", 403, detail, undefined, extensions);
   }
 }
 
 class NotFound extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/404", "Not Found", 404, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/404", "Not Found", 404, detail, undefined, extensions);
   }
 }
 
 class MethodNotAllowed extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/405", "Method Not Allowed", 405, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/405", "Method Not Allowed", 405, detail, undefined, extensions);
   }
 }
 
 class NotAcceptable extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/406", "Not Acceptable", 406, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/406", "Not Acceptable", 406, detail, undefined, extensions);
   }
 }
 
 class Conflict extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/409", "Conflict", 409, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/409", "Conflict", 409, detail, undefined, extensions);
   }
 }
 
 // 50X Errors
 class InternalServerError extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/500", "Internal Server Error", 500, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super(
+      "https://httpstatuses.com/500",
+      "Internal Server Error",
+      500,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class NotImplemented extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/501", "Not Implemented", 501, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/501", "Not Implemented", 501, detail, undefined, extensions);
   }
 }
 
 class BadGateway extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/502", "Bad Gateway", 502, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/502", "Bad Gateway", 502, detail, undefined, extensions);
   }
 }
 
 class ServiceUnavailable extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/503", "Service Unavailable", 503, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super(
+      "https://httpstatuses.com/503",
+      "Service Unavailable",
+      503,
+      detail,
+      undefined,
+      extensions
+    );
   }
 }
 
 class GatewayTimeout extends ProblemError {
-  constructor(detail?: string) {
-    super("https://httpstatuses.com/504", "Gateway Timeout", 504, detail);
+  constructor(detail?: string, extensions?: Record<string, any>) {
+    super("https://httpstatuses.com/504", "Gateway Timeout", 504, detail, undefined, extensions);
   }
 }
 
